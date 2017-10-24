@@ -5,6 +5,7 @@ Solver* solver;
 Game::Game() :
 	mWindow()
 {
+	mAgent = new Agent();
 	solver = new Solver();
 }
 
@@ -21,10 +22,10 @@ void Game::clear()
 
 void Game::run()
 {
-	mWindow.create(sf::VideoMode(400, 400), "8/15", sf::Style::Close);
+	mWindow.create(sf::VideoMode(600, 600), "A*", sf::Style::Close);
 	mWindow.setVerticalSyncEnabled(true);
 
-	Map map;
+	//Map map;
 	//map.initialize(4);
 
 	StateStruct::State state;
@@ -43,24 +44,24 @@ void Game::run()
 				break;
 			case sf::Event::KeyPressed:
 
-				if (event.key.code > 26 && event.key.code < 36)
-					map.initialize(event.key.code - 26);
+				/*if (event.key.code > 26 && event.key.code < 36)
+					map.initialize(event.key.code - 26);*/
 
-				if (event.key.code == sf::Keyboard::R)
+				/*if (event.key.code == sf::Keyboard::R)
 					map.restart();
 				if (event.key.code == sf::Keyboard::T)
-					map.shuffleMap();
+					map.shuffleMap();*/
 
 				if (event.key.code == sf::Keyboard::W)
-					map.updateCurrentState(map.move(Map::up, map.getCurrentState()));
+					mAgent->move(Agent::direction::up);
 				if (event.key.code == sf::Keyboard::S)
-					map.updateCurrentState(map.move(Map::down, map.getCurrentState()));
+					mAgent->move(Agent::direction::down);
 				if (event.key.code == sf::Keyboard::A)
-					map.updateCurrentState(map.move(Map::left, map.getCurrentState()));
+					mAgent->move(Agent::direction::left);
 				if (event.key.code == sf::Keyboard::D)
-					map.updateCurrentState(map.move(Map::right, map.getCurrentState()));
+					mAgent->move(Agent::direction::right);
 				
-				if (event.key.code == sf::Keyboard::Space)
+				/*if (event.key.code == sf::Keyboard::Space)
 				{
 					std::cout << "Solving..." << std::endl;
 					std::vector<Node*> cameFrom;
@@ -76,7 +77,7 @@ void Game::run()
 				else
 				{
 					map.printMap(map.getCurrentState());
-				}
+				}*/
 				
 
 			case sf::Event::MouseButtonPressed:

@@ -29,7 +29,7 @@ std::vector<Node*> Solver::solve(StateStruct::State start, StateStruct::State go
 	while (!openList.empty()) 
 	{
 		iterations++;
-		if (iterations % 1000 == 0)
+		//if (iterations % 1000 == 0)
 			std::cout << iterations << " iterations..." << std::endl;
 
 		Node *current = openList.top();
@@ -37,6 +37,7 @@ std::vector<Node*> Solver::solve(StateStruct::State start, StateStruct::State go
 		{
 			std::cout << "Found solution after " << iterations << " iterations" << std::endl;
 			current->reconstructPath(cameFrom);
+			std::cout << "camefrom" << cameFrom.size() << std::endl;
 			return cameFrom;
 		}
 
@@ -46,8 +47,6 @@ std::vector<Node*> Solver::solve(StateStruct::State start, StateStruct::State go
 		openSet.erase(current);
 		openList.pop();
 		closedList.push_back(current);
-
-		//std::cout << "Nr of children: " << current->getChildren().size() << std::endl;
 
 		for each (Node* child in current->getChildren())
 		{

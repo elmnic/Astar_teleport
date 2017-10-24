@@ -3,8 +3,8 @@
 #include <SFML\Window.hpp>
 #include <SFML\Graphics.hpp>
 #include <SFML\System.hpp>
-#include "Map.h"
 #include "Solver.h"
+#include "Agent.h"
 
 
 class Game
@@ -23,5 +23,7 @@ private:
 	void clear();
 	
 	sf::RenderWindow mWindow;
+
+	Agent* mAgent;
 };
 

@@ -14,12 +14,13 @@ public:
 	~Node();
 
 	void expandChildren();
-	int heuristic();
+	float heuristic();
 
-	int pathCost;
-	int heuristicCost;
+	float pathCost;
+	float heuristicCost;
+
 	// totalCost = pathCost + heuristicCost
-	int totalCost;
+	float totalCost;
 
 	void reconstructPath(std::vector<Node*> &cameFrom);
 
@@ -29,10 +30,11 @@ public:
 	std::vector<Node*> getChildren() { return mChildren; };
 
 private:
-	int mCost;
-	StateStruct::State mState;
+	StateStruct::State mState; // Its position
 	Node* mParent;
 	std::vector<Node*> mChildren;
+
+	Map* mMap;
 
 };
 

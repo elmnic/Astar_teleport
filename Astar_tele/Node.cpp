@@ -7,6 +7,7 @@ Node::Node(StateStruct::State state, Node* parent, int cost) :
 	mParent(parent),
 	pathCost(cost)
 {
+	mMap = new Map();
 	heuristicCost = heuristic();
 	totalCost = pathCost + heuristicCost;
 }
@@ -19,79 +20,107 @@ Node::~Node()
 
 void Node::expandChildren()
 {
-	Map map;
 	// Iterate through the four possible directions
 	for (int i = 0; i < 4; i++)
 	{
+		// Create new state by making a move in a valid direction
+		StateStruct::State newState = mState;
+		int weight = 0;
+		switch (static_cast<Map::direction>(i))
+		{
+		case Map::direction::up:
+			if (mState.y > 0)
+				newState.y--;
+			if (mMap->getID(newState) == Map::tileID::teleport)
+				newState = mMap->findOtherTeleport(newState);
+			weight = mMap->getWeight(newState);
+			break;
+		case Map::direction::down:
+			if (mState.y < mMap->getHeight() - 1)
+				newState.y++;
+			if (mMap->getID(newState) == Map::tileID::teleport)
+				newState = mMap->findOtherTeleport(newState);
+			weight = mMap->getWeight(newState);
+			break;
+		case Map::direction::left:
+			if (mState.x > 0)
+				newState.x--;
+			if (mMap->getID(newState) == Map::tileID::teleport)
+				newState = mMap->findOtherTeleport(newState);
+			weight = mMap->getWeight(newState);
+			break;
+		case Map::direction::right:
+			if (mState.x < mMap->getWidth() - 1)
+				newState.x++;
+			if (mMap->getID(newState) == Map::tileID::teleport)
+				newState = mMap->findOtherTeleport(newState);
+			weight = mMap->getWeight(newState);
+			break;
+		default:
+			break;
+		}
 
-		// Create new state by making a move in a direction
-		//std::cout << "Move to be made: " << static_cast<Map::direction>(i) << std::endl;
-		StateStruct::State newState = map.move(static_cast<Map::direction>(i), mState);
+
+		//StateStruct::State newState = map.move(static_cast<Map::direction>(i), mState);
 
 		// If parent exists and newState is the same as the parent's state, then skip
 		if (mParent != NULL)
 		{
 			if (StateStruct::compare(newState, mParent->getState()))
 			{
-				//std::cout << "New state is parent. Skip" << std::endl;
 				continue;
 			}
 		}
-		
-		//std::cout << "New State: \n";
-		//Map::printMap(newState);
 
 		// If the move is valid, add it to the child nodes
-		if (newState != StateStruct::State(NULL))
-		{
-			//std::cout << "Added child to neighbours" << std::endl;
-			mChildren.push_back(new Node(newState, this, pathCost + 1));
-			//std::cout << "Child cost: " << mChildren.back()->pathCost + mChildren.back()->heuristicCost << std::endl;
-		}
+		mChildren.push_back(new Node(newState, this, pathCost + weight));
 	}
 
 }
 
-// Calculates the cumulative manhattan distance for all values on the board
-int Node::heuristic()
+// Calculates the pythagorean distance
+float Node::heuristic()
 {
-	int fieldSize = mState.size() * mState.size();
+	sf::Vector2i goalPos = mMap->getGoal();
+	return std::sqrtf(std::powf(goalPos.x - mState.x, 2) + std::powf(goalPos.y - mState.y, 2));
 
-	// Search for targetValue and calc manhattan distance from target position
-	int targetValue = 1;
-	bool foundTarget = false;
-	int totalCost = 0;
+	//int fieldSize = mState.size() * mState.size();
 
-	// Manhattan distance
-	while (targetValue < fieldSize)
-	{
-		int targetPosX = (targetValue - 1) / (int)mState.size();
-		int targetPosY = (targetValue - 1) % (int)mState.size();
-		int actualPosX;
-		int actualPosY;
-		for (int i = 0; i < mState.size(); i++)
-		{
-			for (int j = 0; j < mState.size(); j++)
-			{
-				if (mState[i][j] == targetValue)
-				{
-					actualPosX = i;
-					actualPosY = j;
-					int manhDis = std::abs(targetPosX - actualPosX) + std::abs(targetPosY - actualPosY);
-					totalCost += manhDis;
-					//std::cout << "Calculated cost for value " << targetValue << ": " << manhDis << std::endl << std::endl;
-					targetValue++;
-					foundTarget = true;
-					break;
-				}
-			}
-			if (foundTarget)
-				break;
-		}
-		foundTarget = false;
-	}
+	//// Search for targetValue and calc manhattan distance from target position
+	//int targetValue = 1;
+	//bool foundTarget = false;
+	//int totalCost = 0;
 
-	return totalCost;
+	//// Manhattan distance
+	//while (targetValue < fieldSize)
+	//{
+	//	int targetPosX = (targetValue - 1) / (int)mState.size();
+	//	int targetPosY = (targetValue - 1) % (int)mState.size();
+	//	int actualPosX;
+	//	int actualPosY;
+	//	for (int i = 0; i < mState.size(); i++)
+	//	{
+	//		for (int j = 0; j < mState.size(); j++)
+	//		{
+	//			if (mState[i][j] == targetValue)
+	//			{
+	//				actualPosX = i;
+	//				actualPosY = j;
+	//				int manhDis = std::abs(targetPosX - actualPosX) + std::abs(targetPosY - actualPosY);
+	//				totalCost += manhDis;
+	//				//std::cout << "Calculated cost for value " << targetValue << ": " << manhDis << std::endl << std::endl;
+	//				targetValue++;
+	//				foundTarget = true;
+	//				break;
+	//			}
+	//		}
+	//		if (foundTarget)
+	//			break;
+	//	}
+	//	foundTarget = false;
+	//}
+
+	//return totalCost;
 }
 
 void Node::reconstructPath(std::vector<Node*>& cameFrom)
