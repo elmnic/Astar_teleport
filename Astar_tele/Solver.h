@@ -18,8 +18,10 @@ class Solver
 {
 public:
 
-	Solver();
+	static Solver* instance();
 	~Solver();
+
+	void render(sf::RenderWindow &window, bool closed, bool open, sf::Vector2f mapSize);
 
 	std::vector<Node*> solve(StateStruct::State start, StateStruct::State goal);
 	std::vector<Node*> reconstructPath(Node* finalChild);
@@ -27,6 +29,7 @@ public:
 	void clear();
 
 private:
+	Solver();
 	bool isGoal(StateStruct:: State state, StateStruct::State goal);
 
 	// Queue not yet expanded child nodes

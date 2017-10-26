@@ -7,7 +7,7 @@ Node::Node(StateStruct::State state, Node* parent, int cost) :
 	mParent(parent),
 	pathCost(cost)
 {
-	mMap = new Map();
+	mMap = Map::instance();
 	heuristicCost = heuristic();
 	totalCost = pathCost + heuristicCost;
 }
@@ -15,7 +15,7 @@ Node::Node(StateStruct::State state, Node* parent, int cost) :
 
 Node::~Node()
 {
-	clear();
+	//clear();
 }
 
 void Node::expandChildren()
@@ -31,35 +31,29 @@ void Node::expandChildren()
 		case Map::direction::up:
 			if (mState.y > 0)
 				newState.y--;
-			if (mMap->getID(newState) == Map::tileID::teleport)
-				newState = mMap->findOtherTeleport(newState);
-			weight = mMap->getWeight(newState);
 			break;
 		case Map::direction::down:
 			if (mState.y < mMap->getHeight() - 1)
 				newState.y++;
-			if (mMap->getID(newState) == Map::tileID::teleport)
-				newState = mMap->findOtherTeleport(newState);
-			weight = mMap->getWeight(newState);
 			break;
 		case Map::direction::left:
 			if (mState.x > 0)
 				newState.x--;
-			if (mMap->getID(newState) == Map::tileID::teleport)
-				newState = mMap->findOtherTeleport(newState);
-			weight = mMap->getWeight(newState);
 			break;
 		case Map::direction::right:
 			if (mState.x < mMap->getWidth() - 1)
 				newState.x++;
-			if (mMap->getID(newState) == Map::tileID::teleport)
-				newState = mMap->findOtherTeleport(newState);
-			weight = mMap->getWeight(newState);
 			break;
 		default:
 			break;
 		}
 
+		if (mMap->getID(newState) == Map::tileID::wall)
+			continue; // Skip this node if position is wall
+
+		if (mMap->getID(newState) == Map::tileID::teleport)
+			newState = mMap->findOtherTeleport(newState);
+		weight = mMap->getWeight(newState);
 
 		//StateStruct::State newState = map.move(static_cast<Map::direction>(i), mState);
 

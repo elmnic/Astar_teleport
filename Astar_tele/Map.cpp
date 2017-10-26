@@ -3,12 +3,79 @@
 
 Map::Map()
 {
-	//printMap(mMap);
+	printMap(mMap);
 }
 
+Map* Map::instance()
+{
+	static Map map;
+	return &map;
+}
 
 Map::~Map()
 {
+}
+
+void Map::update(sf::RenderWindow & window)
+{
+}
+
+void Map::render(sf::RenderWindow & window)
+{
+	float sizeX = 0;
+	float sizeY = 0;
+	sizeX = window.getSize().x / getWidth();
+	sizeY = window.getSize().y / getHeight();
+
+	for (int i = 0; i < mMap.size(); i++)
+	{
+		for (int j = 0; j < mMap[i].size(); j++)
+		{
+			sf::Vector2f pos = sf::Vector2f(j * sizeX, i * sizeY);
+
+			sf::RectangleShape rect(sf::Vector2f(sizeX, sizeY));
+			rect.setPosition(pos);
+			rect.setOutlineColor(sf::Color::Black);
+			rect.setOutlineThickness(2.5f);
+
+			sf::CircleShape circle(sizeX / 2);
+			circle.setPosition(pos);
+
+			switch (mMap[i][j])
+			{
+			case tileID::empty:
+				rect.setFillColor(sf::Color::Green);
+				window.draw(rect);
+				break;
+			case tileID::agent:
+				circle.setFillColor(sf::Color::Red);
+				window.draw(circle);
+				break;
+			case tileID::wall:
+				rect.setFillColor(sf::Color(55, 55, 55)); // Gray
+				window.draw(rect);
+				break;
+			case tileID::teleport:
+				rect.setFillColor(sf::Color::Blue);
+				window.draw(rect);
+				break;
+			case tileID::goal:
+				rect.setFillColor(sf::Color::Magenta);
+				window.draw(rect);
+				break;
+			case tileID::expensive:
+				rect.setFillColor(sf::Color(139,69,19)); // Brown
+				window.draw(rect);
+				break;
+			case tileID::bestPath:
+				circle.setFillColor(sf::Color::White);
+				window.draw(rect);
+				break;
+			default:
+				break;
+			}
+		}
+	}
 }
 
 void Map::initialize(int fieldSize)
@@ -61,25 +128,25 @@ int Map::getWeight(sf::Vector2i position)
 	int tileID = mMap[position.y][position.x];
 	switch (tileID)
 	{
-	case 0: // Empty
-		return 5;
+	case tileID::empty: // Empty
+		return 1;
 		break;
-	case 1: // Agent
+	case tileID::agent: // Agent
 		return 0;
 		break;
-	case 2: // Wall
-		return 100;
+	case tileID::wall: // Wall
+		return 10000;
 		break;
-	case 3: // Teleport
-		return 7;
-		break;
-	case 4: // Goal
+	case tileID::teleport: // Teleport
 		return 5;
 		break;
-	case 5: // Expensive path
-		return 10;
+	case tileID::goal: // Goal
+		return 1;
 		break;
-	case 6: // Path outline
+	case tileID::expensive: // Expensive path
+		return 15;
+		break;
+	case tileID::bestPath: // Path outline
 		return 0;
 		break;
 	default:
@@ -99,7 +166,6 @@ sf::Vector2i Map::findOtherTeleport(sf::Vector2i fromPos)
 			if (mMap[j][i] == tileID::teleport && (i != fromPos.x || j != fromPos.y))
 			{
 				otherPos = sf::Vector2i(i, j);
-				std::cout << "X: " << i << " Y: " << j << std::endl;
 				break;
 			}
 		}

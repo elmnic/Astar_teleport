@@ -5,6 +5,7 @@
 #include <SFML\System.hpp>
 #include "Solver.h"
 #include "Agent.h"
+#include "Hunter.h"
 
 
 class Game
@@ -18,12 +19,18 @@ public:
 
 private:
 	
-	
+	void update();
 	void render();
 	void clear();
 	
 	sf::RenderWindow mWindow;
 
 	Agent* mAgent;
+	Hunter* mHunter;
+	Solver* mSolver;
+	Map* mMap;
+
+	bool mRenderClosed = false;
+	bool mRenderOpen = false;
 };
 

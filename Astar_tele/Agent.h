@@ -8,17 +8,22 @@
 class Agent
 {
 public:
-
+	static Agent* instance();
 	enum direction { up, down, left, right };
-	Agent();
 	~Agent();
 
-	// Returns the cost of the tile to move into
-	int move(direction dir);
+	void update(sf::RenderWindow &window);
+	void render(sf::RenderWindow &window);
 
+	// Returns the cost of the tile to move into
+	void move(direction dir);
 	sf::Vector2i getPosition() { return mPosition; }
 
 private:
+	Agent();
+
+	void findPath(sf::Vector2i target);
+
 	sf::Vector2i mPosition;
 	Map* mMap;
 	Solver* mSolver;
